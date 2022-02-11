@@ -41,10 +41,11 @@ app.get("/", (req, res) => {
     res.render("index");
 });
 
+app.get("/register", (req, res) => {
+    res.render("register");
+});
 app.post("/register", async (req, res) => {
     const {username, password, confpass} = req.body;
-
-    console.log(req.body);
 
     if(!username || !password || !confpass) return res.render("register", {msg: "empty boxes"});
     //if(!/^[a-zA-Z0-9_]{4, 32}$/i.test(username)) return res.render("register", {msg: "bad username"});
@@ -57,14 +58,42 @@ app.post("/register", async (req, res) => {
     const [id] = await db("users").insert({username, created});
     bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(password, salt, async (err, hash) => {
-            await db("passwords").insert({id, salt, hash});
+            await db("passwords").insert({id, hash});
 
             res.cookie("session", sessions.add(id.toString()))
                .cookie("username", username)
                .redirect("/");
         });
     });
-})
+});
+
+app.get("/login", (req, res) => {
+    res.render("login");
+});
+app.post("/login", async (req, res) => {
+    const {username, password} = req.body;
+
+    if(!username || !password) return res.render("login", {msg: "empty boxes"});
+
+    const msg = "Username or password is incorrect.";
+
+    const [user] = await db("users").select().where("username", username);
+    if(!user) return res.render("login", {msg});
+
+    const [pword] = await db("passwords").select().where("id", user.id);
+    bcrypt.compare(password, pword.hash, (err, result) => {
+        if(!result) return res.render("login", {msg});
+
+        res.cookie("session", sessions.add(user.id))
+           .cookie("username", username)
+           .redirect("/");
+    });
+});
+
+
+app.get("*", (req, res) => {
+    res.render("404");
+});
 
 app.listen(process.env.PORT || "8080", () => {
     console.log("Server Started.");

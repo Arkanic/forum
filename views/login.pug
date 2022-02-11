@@ -4,11 +4,9 @@ html
     body
         if msg
             p(style="color:red")=msg
-        form(method="POST" action="/register")
+        form(method="POST" action="/login")
             input(required name="username" type="text" placeholder="Username")
             br
             input(required name="password" type="password" placeholder="Password")
-            br
-            input(required name="confpass" type="password" placeholder="Confirm Password")
             br
             input(type="submit" value="Submit")

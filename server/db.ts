@@ -34,7 +34,6 @@ export async function initdb(schema:knex.Knex.SchemaBuilder):Promise<knex.Knex.S
     }).createTable("passwords", table => {
         table.integer("id").unsigned();
         table.binary("hash");
-        table.binary("salt");
     }).createTable("posts", table => {
         table.increments("id").primary();
         table.date("created");

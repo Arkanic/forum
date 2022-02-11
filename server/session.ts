@@ -1,4 +1,4 @@
-import uuid from "uuid";
+import {nanoid} from "nanoid";
 import express from "express";
 
 class Sessions extends Map {
@@ -10,7 +10,7 @@ class Sessions extends Map {
     }
 
     add(name:string):string {
-        const id = uuid.v4();
+        const id = nanoid(32);
         this.set(id, name);
 
         setTimeout(() => {
