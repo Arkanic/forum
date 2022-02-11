@@ -9,8 +9,8 @@
     "clean": "rm -rf ./buildc ./builds",
     "cbuild": "webpack --config ./webpack/webpack.prod.js",
     "sbuild": "tsc",
-    "server": "cross-env NODE_ENV=production node ./sbuild/server.js",
-    "devserver": "cross-env NODE_ENV=development node ./sbuild/server.js --progress",
+    "server": "cross-env NODE_ENV=production node ./builds/server.js",
+    "devserver": "cross-env NODE_ENV=development node ./builds/server.js --progress",
     "quick": "npm run build && npm run server",
     "quickdev": "npm run sbuild && npm run devserver"
   },
