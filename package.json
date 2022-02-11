@@ -1,0 +1,45 @@
+{
+  "name": "forum",
+  "version": "1.0.0",
+  "description": "node.js forum",
+  "main": "server/server.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run clean && npm run sbuild && npm run cbuild",
+    "clean": "rm -rf ./buildc ./builds",
+    "cbuild": "webpack --config ./webpack/webpack.prod.js",
+    "sbuild": "tsc",
+    "server": "cross-env NODE_ENV=production node ./sbuild/server.js",
+    "devserver": "cross-env NODE_ENV=development node ./sbuild/server.js --progress",
+    "quick": "npm run build && npm run server",
+    "quickdev": "npm run sbuild && npm run devserver"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arkanic/forum.git"
+  },
+  "author": "Arkanic",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Arkanic/forum/issues"
+  },
+  "homepage": "https://github.com/Arkanic/forum#readme",
+  "dependencies": {
+    "@types/express": "^4.17.13",
+    "@types/webpack": "^5.28.0",
+    "@types/webpack-dev-middleware": "^5.3.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "cross-env": "^7.0.3",
+    "express": "^4.17.2",
+    "pug": "^3.0.2",
+    "terser-webpack-plugin": "^5.3.1",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.5",
+    "webpack": "^5.68.0",
+    "webpack-dev-middleware": "^5.3.1",
+    "webpack-merge": "^5.8.0"
+  },
+  "devDependencies": {
+    "webpack-cli": "^4.9.2"
+  }
+}
