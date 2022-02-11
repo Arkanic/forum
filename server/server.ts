@@ -37,6 +37,20 @@ if(process.env.NODE_ENV == "development") {
     app.use(express.static("buildc"));
 }
 
+// setup locals for pug
+app.use(async (req, res, next) => {
+    if(!req.cookies.session) return next();
+
+    let id = sessions.from(req);
+    if(!id) return next();
+
+    let [user] = await db("users").select().where("id", id);
+    res.locals.username = user.username;
+
+    next();
+});
+
+
 app.get("/", (req, res) => {
     res.render("index");
 });

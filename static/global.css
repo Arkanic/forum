@@ -1,3 +1,59 @@
+html {
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
 * {
     font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1024px;
+    min-width: 256px;
+    padding: 8px 24px 24px 24px;
+}
+
+.servermsg {
+    color: red;
+}
+
+.header h1 {
+    font-size: 24px;
+    text-align: left;
+}
+
+nav ul {
+    list-style-type: none;
+    background-color: darkblue;
+    border: 0px;
+    padding: 16px;
+}
+
+nav ul li {
+    display: inline;
+    border-right: 8px;
+    padding-right: 8px;
+    padding-left: 8px;
+}
+
+nav ul li:last-child {
+    border-right: none;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #111;
+}
+
+nav li.selected {
+    color: #606060;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
 }

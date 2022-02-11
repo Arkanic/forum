@@ -2,8 +2,9 @@ html
     head
         include includes/head.pug
     body
+        include includes/header.pug
         if msg
-            p(style="color:red")=msg
+            p(class="servermsg")=msg
         form(method="POST" action="/register")
             input(required name="username" type="text" placeholder="Username")
             br

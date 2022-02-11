@@ -1,0 +1,15 @@
+.headerbox
+    h1 Forum
+    p
+        if username
+            i Logged in as #{username}
+        else
+            i Not logged in
+    nav
+        ul
+            li
+                a(href="/") Home
+            li
+                a(href="/register") Register
+            li
+                a(href="/login") Login
