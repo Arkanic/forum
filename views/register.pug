@@ -1,0 +1,14 @@
+html
+    head
+        include includes/head.pug
+    body
+        if msg
+            p(style="color:red")=msg
+        form(method="POST" action="/register")
+            input(required name="username" type="text" placeholder="Username")
+            br
+            input(required name="password" type="text" placeholder="Password")
+            br
+            input(required name="confpass" type="text" placeholder="Confirm Password")
+            br
+            input(type="submit" value="Submit")
