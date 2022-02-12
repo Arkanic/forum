@@ -5,10 +5,15 @@
             i Logged in as #{username}
         else
             i Not logged in
+    if username
+        form(method="POST" action="/logout" class="logout-form")
+            input(type="submit" value="logout")
     nav
         ul
             li
                 a(href="/") Home
+            li
+                a(href="/post") Create Post
             li
                 a(href="/register") Register
             li

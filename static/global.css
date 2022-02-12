@@ -18,6 +18,10 @@ body {
     padding: 8px 24px 24px 24px;
 }
 
+.hidden {
+    display: none !important;
+}
+
 .servermsg {
     color: red;
 }
@@ -56,4 +60,29 @@ nav li.selected {
 
 nav ul li a:hover {
     text-decoration: underline;
+}
+
+.logout-form {
+    float: right;
+    text-align: right;
+}
+
+.section {
+    border: 1px solid black;
+    margin-bottom: 24px;
+    min-height: 64px;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.postbox * {
+    padding-left: 4px;
+}
+
+.postbox h4 {
+    margin-bottom: 6px;
+}
+
+.postpreview {
+    font-size: 12px;
 }

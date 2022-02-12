@@ -3,5 +3,7 @@ html
         include includes/head.pug
     body
         include includes/header.pug
-        each post in posts
-            include includes/preview.pug
+        h2=fpost.title
+        p
+            i=fpost.author
+        p=fpost.body

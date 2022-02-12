@@ -1,0 +1,8 @@
+.section
+    h4
+        - let link = `/posts/${post.id}/`;
+        a(href=link)=post.title
+    p
+        i=post.author.username
+    - let postpreview = `${post.body.substring(0, 100)}${(post.body.length > 100) ? "..." : ""}`;
+    p.postpreview=postpreview
