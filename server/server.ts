@@ -180,7 +180,7 @@ app.get("/posts/:id", async (req, res, next) => {
         body: post.body
     };
 
-    let [user] = await db("users").select().where("id", post.id);
+    let [user] = await db("users").select().where("id", post.author);
     fpost.author = user.username;
 
     res.locals.fpost = fpost;
