@@ -4,11 +4,13 @@ import webpackDevMiddleware from "webpack-dev-middleware";
 
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
+import multer from "multer";
 
 import bcrypt from "bcrypt";
 
 import database from "./db";
 import s from "./session";
+import * as file from "./file";
 
 // IDE seems confused about typescript version, so this errors.
 // @ts-expect-error
@@ -18,6 +20,7 @@ let db:Knex<any, unknown[]>;
 })();
 
 const sessions = s();
+const upload = file.initFiles(db);
 
 const config = require("../webpack/webpack.dev");
 
@@ -28,7 +31,9 @@ app.set("views", "./views");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
+
 app.use(express.static("static"));
+app.use("/files", express.static("/fdata/files/"));
 
 if(process.env.NODE_ENV == "development") {
     const compiler = webpack(config);
@@ -76,10 +81,11 @@ app.get("/", async (req, res) => {
                 author: {}
             };
 
-            const author = await db("users").select().where("id", r.author);
+            const [author] = await db("users").select().where("id", r.author);
             post.author = {
                 username: author.username,
-                avatar: author.avatar
+                avatar: author.avatar,
+                id: author.id
             }
 
             resolve(post);
@@ -153,7 +159,7 @@ app.get("/post", (req, res) => {
     if(!res.locals.loggedin) res.redirect("/login");
     res.render("create");
 });
-app.post("/post", async (req, res) => {
+app.post("/post", upload.single("file"), async (req, res) => {
     const {title, body} = req.body;
 
     let id = res.locals.id;
@@ -163,7 +169,7 @@ app.post("/post", async (req, res) => {
         title: title.substring(0, 100) || "unnamed",
         body: body.substring(0, 3000) || "",
         author: id,
-        attachment: null
+        attachment: (req.file) ? req.file.filename : null
     });
     
     res.redirect(`/posts/${pid}`);
@@ -176,17 +182,36 @@ app.get("/posts/:id", async (req, res, next) => {
     let fpost = {
         title: post.title,
         created: post.created,
-        author: null,
-        body: post.body
+        author: {},
+        body: post.body,
+        attachment: post.attachment
     };
 
     let [user] = await db("users").select().where("id", post.author);
-    fpost.author = user.username;
+    fpost.author = {
+        username: user.username,
+        id: user.id
+    };
 
     res.locals.fpost = fpost;
     res.render("post");
 }, (req, res, next) => {
     res.render("404");
+});
+
+app.get("/users/:id", async (req, res, next) => {
+    const [user] = await db("users").select().where("id", req.params.id);
+    if(!user) return next();
+
+    let fuser = {
+        created: user.created,
+        username: user.username,
+        about: user.about || "(no bio)",
+        avatar: user.avatar
+    };
+
+    res.locals.fuser = fuser;
+    res.render("user");
 });
 
 

@@ -86,3 +86,9 @@ nav ul li a:hover {
 .postpreview {
     font-size: 12px;
 }
+
+.postcontents {
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+}

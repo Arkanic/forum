@@ -18,3 +18,7 @@
                 a(href="/register") Register
             li
                 a(href="/login") Login
+            if loggedin
+                li
+                    - let profilelink = `/users/${id}/`
+                    a(href=profilelink) Profile

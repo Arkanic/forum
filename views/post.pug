@@ -5,5 +5,12 @@ html
         include includes/header.pug
         h2=fpost.title
         p
-            i=fpost.author
-        p=fpost.body
+            i
+                - let userlink = `/users/${fpost.author.id}/`
+                a(href=userlink) by #{fpost.author.username}
+        p
+            pre.postcontents=fpost.body
+        p
+            if(fpost.attachment)
+                - let alink = `/files/${fpost.attachment}`
+                a(href=alink) attachment

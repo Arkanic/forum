@@ -40,7 +40,7 @@ export async function initdb(schema:knex.Knex.SchemaBuilder):Promise<knex.Knex.S
         table.integer("author").unsigned();
         table.string("title", 100);
         table.string("body", 3000);
-        table.integer("attachment").unsigned();
+        table.string("attachment");
         // comments is an array of comment ids
         table.json("comments");
     }).createTable("comments", table => {
@@ -50,9 +50,5 @@ export async function initdb(schema:knex.Knex.SchemaBuilder):Promise<knex.Knex.S
         table.string("body", 1000);
         // same as above, these are child comments
         table.json("comments");
-    }).createTable("files", table => {
-        table.increments("id").primary();
-        table.string("hash");
-        table.string("name");
     });
 }
