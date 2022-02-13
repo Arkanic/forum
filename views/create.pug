@@ -3,7 +3,7 @@ html
         include includes/head.pug
     body
         include includes/header.pug
-        form(method="POST" action="/post")
+        form(method="POST" action="/post" enctype="multipart/form-data")
             input(required name="title" type="text" placeholder="title")
             br
             textarea(required name="body" placeholder="text...")

@@ -1,16 +1,19 @@
+import path from "path";
+import fs from "fs";
+
 import express from "express";
 import webpack from "webpack";
 import webpackDevMiddleware from "webpack-dev-middleware";
 
 import cookieParser from "cookie-parser";
+import fileUpload from "express-fileupload";
 import bodyParser from "body-parser";
-import multer from "multer";
 
 import bcrypt from "bcrypt";
+import {customAlphabet} from "nanoid";
 
 import database from "./db";
 import s from "./session";
-import * as file from "./file";
 
 // IDE seems confused about typescript version, so this errors.
 // @ts-expect-error
@@ -20,7 +23,6 @@ let db:Knex<any, unknown[]>;
 })();
 
 const sessions = s();
-const upload = file.initFiles(db);
 
 const config = require("../webpack/webpack.dev");
 
@@ -28,18 +30,37 @@ const app = express();
 
 app.set("view engine", "pug");
 app.set("views", "./views");
-app.use(bodyParser.json());
+app.use(fileUpload({}));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 
 app.use(express.static("static"));
-app.use("/files", express.static("/fdata/files/"));
+app.use("/files", express.static("./fdata/files/"));
 
 if(process.env.NODE_ENV == "development") {
     const compiler = webpack(config);
     app.use(webpackDevMiddleware(compiler));
 } else {
     app.use(express.static("buildc"));
+}
+
+const DATA_DIR = "fdata";
+const FILE_DIR = "files";
+
+const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const fnanoid = customAlphabet(alphabet, 32);
+
+function manipFile(req:express.Request):string {
+    if(!req.files) return "";
+
+    let file:fileUpload.UploadedFile = req.files.file as any as fileUpload.UploadedFile;
+
+    let fpath = `./${DATA_DIR}/${FILE_DIR}`;
+    let name = `${fnanoid()}${path.extname(file.name)}`;
+    
+    file.mv(`${fpath}/${name}`);
+
+    return name;
 }
 
 app.use(async (req, res, next) => {
@@ -159,8 +180,13 @@ app.get("/post", (req, res) => {
     if(!res.locals.loggedin) res.redirect("/login");
     res.render("create");
 });
-app.post("/post", upload.single("file"), async (req, res) => {
+app.post("/post", async (req, res) => {
+    if(!res.locals.loggedin) res.redirect("/login"); // stop
+
     const {title, body} = req.body;
+
+    let name;
+    if(req.files) name = manipFile(req);
 
     let id = res.locals.id;
 
@@ -169,7 +195,7 @@ app.post("/post", upload.single("file"), async (req, res) => {
         title: title.substring(0, 100) || "unnamed",
         body: body.substring(0, 3000) || "",
         author: id,
-        attachment: (req.file) ? req.file.filename : null
+        attachment: (req.files) ? name : null
     });
     
     res.redirect(`/posts/${pid}`);
@@ -177,7 +203,7 @@ app.post("/post", upload.single("file"), async (req, res) => {
 
 app.get("/posts/:id", async (req, res, next) => {
     const [post] = await db("posts").select().where("id", req.params.id);
-    if(!post) return next();
+    if(!post) return res.render("404");
     
     let fpost = {
         title: post.title,
@@ -195,8 +221,6 @@ app.get("/posts/:id", async (req, res, next) => {
 
     res.locals.fpost = fpost;
     res.render("post");
-}, (req, res, next) => {
-    res.render("404");
 });
 
 app.get("/users/:id", async (req, res, next) => {
