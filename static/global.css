@@ -89,7 +89,11 @@ nav ul li a:hover {
 }
 
 .postcontents {
-    font-size: 12px;
+    font-size: 16px;
     margin: 0;
     padding: 0;
+}
+
+.postauthor {
+    font-size: 12px;
 }

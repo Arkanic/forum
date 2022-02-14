@@ -7,7 +7,7 @@ html
         p
             i
                 - let userlink = `/users/${fpost.author.id}/`
-                a(href=userlink) by #{fpost.author.username}
+                a(href=userlink class="postauthor") by #{fpost.author.username}
         p
             pre.postcontents=fpost.body
         p
