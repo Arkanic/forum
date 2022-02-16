@@ -4,10 +4,9 @@ html
     body
         include includes/header.pug
         h2=fpost.title
-        p
-            i
-                - let userlink = `/users/${fpost.author.id}/`
-                a(href=userlink class="postauthor") by #{fpost.author.username}
+        - let userbox = {username: fpost.author.username, avatar: fpost.author.avatar, id: fpost.author.id}
+        include includes/userbox.pug
+        hr
         p
             pre.postcontents=fpost.body
         p

@@ -3,6 +3,10 @@ html
         include includes/head.pug
     body
         include includes/header.pug
+
         h2=fuser.username
+        - let imagelink = `/files/${fuser.avatar}`
+        if fuser.avatar
+            img(src=imagelink width="32" height="32")
         p
             pre=fuser.about

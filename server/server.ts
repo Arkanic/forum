@@ -6,7 +6,7 @@ import webpack from "webpack";
 import webpackDevMiddleware from "webpack-dev-middleware";
 
 import cookieParser from "cookie-parser";
-import fileUpload from "express-fileupload";
+import fileUpload, { UploadedFile } from "express-fileupload";
 import bodyParser from "body-parser";
 
 import bcrypt from "bcrypt";
@@ -91,7 +91,7 @@ app.use(async (req, res, next) => {
 
 
 app.get("/", async (req, res) => {
-    const recents = await db("posts").orderBy("id", "desc").limit(10);
+    const recents = await db("posts").orderBy("id", "desc").limit(100);
     const posts = await Promise.all(recents.map((r:any) => {
         return new Promise(async (resolve) => {
             let post = {
@@ -177,7 +177,7 @@ app.post("/logout", (req, res) => {
 });
 
 app.get("/post", (req, res) => {
-    if(!res.locals.loggedin) res.redirect("/login");
+    if(!res.locals.loggedin) return res.redirect("/login");
     res.render("create");
 });
 app.post("/post", async (req, res) => {
@@ -201,6 +201,36 @@ app.post("/post", async (req, res) => {
     res.redirect(`/posts/${pid}`);
 });
 
+app.get("/profile", async (req, res) => {
+    if(!res.locals.loggedin) return res.redirect("/login");
+
+    const [user] = await db("users").select().where("id", res.locals.id);
+    res.locals.profile = {
+        bio: user.about
+    }
+
+    res.render("profile");
+});
+app.post("/profile", async (req, res) => {
+    if(!res.locals.loggedin) return res.redirect("/login");
+
+    const {bio} = req.body;
+
+    if(bio) {
+        await db("users").update({about:bio}).where("id", res.locals.id);
+    }
+
+    if(req.files) if(req.files.file) {
+        let mime = (req.files.file as UploadedFile).mimetype
+        if(!(mime == "image/png" || mime == "image/jpeg" || mime == "image/gif" || mime == "image/bmp" || mime == "image/webp")) return res.redirect("/profile");
+
+        let file = manipFile(req);
+        await db("users").update({avatar:file}).where("id", res.locals.id);
+    }
+
+    res.redirect(`/users/${res.locals.id}`);
+});
+
 app.get("/posts/:id", async (req, res, next) => {
     const [post] = await db("posts").select().where("id", req.params.id);
     if(!post) return res.render("404");
@@ -216,7 +246,8 @@ app.get("/posts/:id", async (req, res, next) => {
     let [user] = await db("users").select().where("id", post.author);
     fpost.author = {
         username: user.username,
-        id: user.id
+        id: user.id,
+        avatar: user.avatar
     };
 
     res.locals.fpost = fpost;
