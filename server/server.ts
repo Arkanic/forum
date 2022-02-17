@@ -11,9 +11,11 @@ import bodyParser from "body-parser";
 
 import bcrypt from "bcrypt";
 import {customAlphabet} from "nanoid";
+import mime from "mime";
 
 import database from "./db";
 import s from "./session";
+import { getJSDocImplementsTags, isConstructorDeclaration, parseIsolatedEntityName } from "typescript";
 
 // IDE seems confused about typescript version, so this errors.
 // @ts-expect-error
@@ -195,7 +197,8 @@ app.post("/post", async (req, res) => {
         title: title.substring(0, 100) || "unnamed",
         body: body.substring(0, 3000) || "",
         author: id,
-        attachment: (req.files) ? name : null
+        attachment: (req.files) ? name : null,
+        comments: "[]"
     });
     
     res.redirect(`/posts/${pid}`);
@@ -231,16 +234,46 @@ app.post("/profile", async (req, res) => {
     res.redirect(`/users/${res.locals.id}`);
 });
 
+app.get("/comment", (req, res) => {
+    res.redirect("/");
+});
+app.post("/comment", async (req, res) => {
+    if(!res.locals.loggedin) return res.redirect("/login");
+
+    const {body, id} = req.body;
+    if(!body || !id) return res.redirect("/");
+
+    let [post] = await db("posts").select().where("id", id);
+    if(!post) return res.redirect("/");
+
+    let [cid] = await db("comments").insert({
+        created: new Date(),
+        body: body.substring(0, 1000),
+        author: res.locals.id,
+    });
+
+    post.comments = JSON.parse(post.comments);
+
+    let comments = post.comments || [];
+    comments.push(cid);
+    await db("posts").update({comments: JSON.stringify(comments)}).where("id", id);
+
+    res.redirect(`/posts/${id}`);
+});
+
 app.get("/posts/:id", async (req, res, next) => {
     const [post] = await db("posts").select().where("id", req.params.id);
     if(!post) return res.render("404");
     
-    let fpost = {
+    let fpost:any = {
         title: post.title,
         created: post.created,
         author: {},
+        comments: [],
         body: post.body,
-        attachment: post.attachment
+        attachment: post.attachment,
+        amime: mime.getType(post.attachment),
+        id: post.id
     };
 
     let [user] = await db("users").select().where("id", post.author);
@@ -249,6 +282,30 @@ app.get("/posts/:id", async (req, res, next) => {
         id: user.id,
         avatar: user.avatar
     };
+
+    post.comments = JSON.parse(post.comments);
+
+    let comments:any[] = [];
+    for(let i in post.comments) {
+        let id = post.comments[i];
+
+        let [comment] = await db("comments").select().where("id", id);
+        let fcomment = {
+            author: {},
+            created: comment.created,
+            body: comment.body
+        }
+
+        let [cuser] = await db("users").select().where("id", comment.author);
+        fcomment.author = {
+            username: cuser.username,
+            id: cuser.id,
+            avatar: cuser.avatar
+        }
+
+        comments.push(fcomment);
+    }
+    fpost.comments = comments;
 
     res.locals.fpost = fpost;
     res.render("post");

@@ -1,0 +1,6 @@
+if loggedin
+    form(method="POST" action="/comment")
+        textarea(name="body")
+        input(name="id" value=commentformid type="text" class="hidden")
+        br
+        input(type="submit" value="Submit")

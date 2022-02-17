@@ -13,3 +13,11 @@ html
             if(fpost.attachment)
                 - let alink = `/files/${fpost.attachment}`
                 a(href=alink) attachment
+                p=fpost.amime
+        hr
+        - let commentformid = fpost.id
+        include includes/commentform.pug
+        br
+        for comment in fpost.comments
+            - let cc = comment
+            include includes/comment.pug

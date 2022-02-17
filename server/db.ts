@@ -42,13 +42,11 @@ export async function initdb(schema:knex.Knex.SchemaBuilder):Promise<knex.Knex.S
         table.string("body", 3000);
         table.string("attachment");
         // comments is an array of comment ids
-        table.json("comments");
+        table.string("comments");
     }).createTable("comments", table => {
         table.increments("id").primary();
         table.date("created");
         table.integer("author").unsigned();
         table.string("body", 1000);
-        // same as above, these are child comments
-        table.json("comments");
     });
 }
