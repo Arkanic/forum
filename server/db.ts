@@ -2,10 +2,12 @@ import * as knex from "knex";
 import fs from "fs";
 
 const DATA_DIR = "fdata";
+const FILES_DIR = "files";
 
 export default async ():Promise<knex.Knex<any, unknown[]>> => {
     return new Promise((resolve, reject) => {
         if(!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
+        if(!fs.existsSync(`${DATA_DIR}/${FILES_DIR}`)) fs.mkdirSync(`${DATA_DIR}/${FILES_DIR}`);
 
         const db = knex.default({
             client: "better-sqlite3",

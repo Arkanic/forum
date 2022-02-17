@@ -96,12 +96,14 @@ app.get("/", async (req, res) => {
     const recents = await db("posts").orderBy("id", "desc").limit(100);
     const posts = await Promise.all(recents.map((r:any) => {
         return new Promise(async (resolve) => {
+            r.comments = JSON.parse(r.comments);
             let post = {
                 title: r.title,
                 body: r.body,
                 created: r.created,
                 id: r.id,
-                author: {}
+                author: {},
+                commentcount: r.comments.length
             };
 
             const [author] = await db("users").select().where("id", r.author);
@@ -264,6 +266,7 @@ app.post("/comment", async (req, res) => {
 app.get("/posts/:id", async (req, res, next) => {
     const [post] = await db("posts").select().where("id", req.params.id);
     if(!post) return res.render("404");
+    post.comments = JSON.parse(post.comments);
     
     let fpost:any = {
         title: post.title,
@@ -273,7 +276,7 @@ app.get("/posts/:id", async (req, res, next) => {
         body: post.body,
         attachment: post.attachment,
         amime: mime.getType(post.attachment),
-        id: post.id
+        id: post.id,
     };
 
     let [user] = await db("users").select().where("id", post.author);
@@ -282,8 +285,6 @@ app.get("/posts/:id", async (req, res, next) => {
         id: user.id,
         avatar: user.avatar
     };
-
-    post.comments = JSON.parse(post.comments);
 
     let comments:any[] = [];
     for(let i in post.comments) {

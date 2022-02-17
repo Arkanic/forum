@@ -4,4 +4,4 @@ p
         if userbox.avatar
             - let userboxavatarlink = `/files/${userbox.avatar}`
             img(src=userboxavatarlink width="32" height="32")
-        i=userbox.username
+        i(class="userboxname")=userbox.username

@@ -3,6 +3,8 @@
         - let link = `/posts/${post.id}/`;
         a(href=link)=post.title
     - let userbox = post.author
-    include userbox.pug
+    p
+        include userbox.pug
+        p.postcomments=post.commentcount
     - let postpreview = `${post.body.substring(0, 100)}${(post.body.length > 100) ? "..." : ""}`;
     p.postpreview=postpreview
