@@ -12,7 +12,8 @@
     "server": "cross-env NODE_ENV=production node ./builds/server.js",
     "devserver": "cross-env NODE_ENV=development node ./builds/server.js --progress",
     "quick": "npm run build && npm run server",
-    "quickdev": "npm run sbuild && npm run devserver"
+    "quickdev": "npm run sbuild && npm run devserver",
+    "start": "npm run server"
   },
   "repository": {
     "type": "git",
