@@ -1,7 +1,8 @@
 p
     - let userboxlink = `/users/${userbox.id}/`
     a(href=userboxlink)
+        - let userboxavatarlink = "/ico/defaultuser.png";
         if userbox.avatar
-            - let userboxavatarlink = `/files/${userbox.avatar}`
-            img(src=userboxavatarlink width="32" height="32")
+            - userboxavatarlink = `/files/${userbox.avatar}`
+        img(src=userboxavatarlink width="32" height="32")
         i(class="userboxname")=userbox.username
