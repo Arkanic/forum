@@ -1,7 +1,7 @@
 import {nanoid} from "nanoid";
 import express from "express";
 
-class Sessions extends Map {
+export class Sessions extends Map {
     timeout:number;
 
     constructor(timeout = 1000 * 60 * 60 * 24 * 7) {
