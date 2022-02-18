@@ -52,3 +52,47 @@ export async function initdb(schema:knex.Knex.SchemaBuilder):Promise<knex.Knex.S
         table.string("body", 1000);
     });
 }
+
+// provides generic functions for db
+export class DbConnection {
+    db:knex.Knex<any, unknown[]>
+
+    constructor(db:knex.Knex<any, unknown[]>) {
+        this.db = db;
+    }
+
+    async getByUsername(table:string, username:string) {
+        let [result] = await this.db(table).select().where("username", username);
+        return result;
+    }
+
+    async getById(table:string, id:number | string) {
+        let [result] = await this.db(table).select().where("id", id);
+        return result;
+    }
+
+    async insert(table:string, content:any) {
+        let [id] = await this.db(table).insert(content);
+        return id;
+    }
+
+    async getPost(id:number | string) {
+        let post = await this.getById("posts", id);
+        post.comments = JSON.parse(post.comments);
+        return post;
+    }
+
+    async updateById(table:string, id:number | string, content:any) {
+        await this.db(table).update(content).where("id", id);
+    }
+
+    async updatePost(id:number | string, content:any) {
+        if(content.comments) content.comments = JSON.stringify(content.comments);
+        await this.updateById("posts", id, content);
+    }
+
+    async fetchRecentPosts(count:number) {
+        const posts = await this.db("posts").orderBy("id", "desc").limit(count);
+        return posts;
+    }
+}

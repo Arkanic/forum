@@ -1,6 +1,8 @@
 if loggedin
     form(method="POST" action="/comment")
-        textarea(name="body")
+        textarea(name="body" rows="3" cols="40" placeholder="Comment...")
         input(name="id" value=commentformid type="text" class="hidden")
         br
         input(type="submit" value="Submit")
+else
+    p Please <a href="/login">login</a> to comment on this post.

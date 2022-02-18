@@ -2,9 +2,9 @@ import express from "express";
 import {Context} from "../server";
 
 export default (ctx:Context) => {
-    const {app, db} = ctx;
+    const {app, dbc} = ctx;
     app.get("/", async (req, res) => {
-        const recents = await db("posts").orderBy("id", "desc").limit(100);
+        const recents = await dbc.fetchRecentPosts(100);
         const posts = await Promise.all(recents.map((r: any) => {
             return new Promise(async (resolve) => {
                 r.comments = JSON.parse(r.comments);
@@ -17,7 +17,7 @@ export default (ctx:Context) => {
                     commentcount: r.comments.length
                 };
 
-                const [author] = await db("users").select().where("id", r.author);
+                const author = await dbc.getById("users", r.author);
                 post.author = {
                     username: author.username,
                     avatar: author.avatar,

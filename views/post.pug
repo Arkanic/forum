@@ -15,9 +15,13 @@ html
                 a(href=alink) attachment
                 p=fpost.amime
         hr
+        h4 Comments
+        p
         - let commentformid = fpost.id
         include includes/commentform.pug
         br
         for comment in fpost.comments
             - let cc = comment
             include includes/comment.pug
+        br
+        include includes/commentform.pug

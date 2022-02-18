@@ -3,12 +3,11 @@ import {Context} from "../server";
 import mime from "mime";
 
 export default (ctx:Context) => {
-    const {app, db} = ctx;
+    const {app, dbc} = ctx;
 
     app.get("/posts/:id", async (req, res, next) => {
-        const [post] = await db("posts").select().where("id", req.params.id);
+        const post = await dbc.getPost(req.params.id);
         if (!post) return res.render("404");
-        post.comments = JSON.parse(post.comments);
 
         let fpost: any = {
             title: post.title,
@@ -21,7 +20,7 @@ export default (ctx:Context) => {
             id: post.id,
         };
 
-        let [user] = await db("users").select().where("id", post.author);
+        let user = await dbc.getById("users", post.author);
         fpost.author = {
             username: user.username,
             id: user.id,
@@ -32,14 +31,14 @@ export default (ctx:Context) => {
         for (let i in post.comments) {
             let id = post.comments[i];
 
-            let [comment] = await db("comments").select().where("id", id);
+            let comment = await dbc.getById("comments", id);
             let fcomment = {
                 author: {},
                 created: comment.created,
                 body: comment.body
             }
 
-            let [cuser] = await db("users").select().where("id", comment.author);
+            let cuser = await dbc.getById("users", comment.author);
             fcomment.author = {
                 username: cuser.username,
                 id: cuser.id,
@@ -55,7 +54,7 @@ export default (ctx:Context) => {
     });
 
     app.get("/users/:id", async (req, res, next) => {
-        const [user] = await db("users").select().where("id", req.params.id);
+        const user = await dbc.getById("users", req.params.id);
         if (!user) return next();
 
         let fuser = {

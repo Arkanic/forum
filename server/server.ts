@@ -13,19 +13,19 @@ import create from "./routes/create";
 import index from "./routes/index";
 
 
-import database from "./db";
+import database, {DbConnection} from "./db";
 import s, { Sessions } from "./session";
-import { Knex } from "knex";
 
 export interface Context {
     app:express.Application,
-    db:Knex<any, unknown[]>,
+    dbc:DbConnection,
     sessions:Sessions
 }
 
 
 database().then(db => {
     const sessions = s();
+    const dbConnection = new DbConnection(db);
 
     const config = require("../webpack/webpack.dev");
 
@@ -76,7 +76,7 @@ database().then(db => {
 
     let ctx:Context = {
         app,
-        db,
+        dbc: dbConnection,
         sessions
     };
 

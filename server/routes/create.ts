@@ -24,7 +24,7 @@ function manipFile(req:express.Request):string {
 }
 
 export default (ctx:Context) => {
-    const {app, db} = ctx;
+    const {app, dbc} = ctx;
 
     app.get("/post", (req, res) => {
         if(!res.locals.loggedin) return res.redirect("/login");
@@ -40,7 +40,7 @@ export default (ctx:Context) => {
     
         let id = res.locals.id;
     
-        const [pid] = await db("posts").insert({
+        const pid = await dbc.insert("posts", {
             created: new Date(), 
             title: title.substring(0, 100) || "unnamed",
             body: body.substring(0, 3000) || "",
@@ -55,7 +55,7 @@ export default (ctx:Context) => {
     app.get("/profile", async (req, res) => {
         if(!res.locals.loggedin) return res.redirect("/login");
     
-        const [user] = await db("users").select().where("id", res.locals.id);
+        const user = await dbc.getById("users", res.locals.id);
         res.locals.profile = {
             bio: user.about
         }
@@ -68,7 +68,7 @@ export default (ctx:Context) => {
         const {bio} = req.body;
     
         if(bio) {
-            await db("users").update({about:bio}).where("id", res.locals.id);
+            await dbc.updateById("users", res.locals.id, {about:bio});
         }
     
         if(req.files) if(req.files.file) {
@@ -76,7 +76,7 @@ export default (ctx:Context) => {
             if(!(mime == "image/png" || mime == "image/jpeg" || mime == "image/gif" || mime == "image/bmp" || mime == "image/webp")) return res.redirect("/profile");
     
             let file = manipFile(req);
-            await db("users").update({avatar:file}).where("id", res.locals.id);
+            await dbc.updateById("users", res.locals.id, {avatar:file});
         }
     
         res.redirect(`/users/${res.locals.id}`);
@@ -91,10 +91,10 @@ export default (ctx:Context) => {
         const {body, id} = req.body;
         if(!body || !id) return res.redirect("/");
     
-        let [post] = await db("posts").select().where("id", id);
+        let post = await dbc.getById("posts", id);
         if(!post) return res.redirect("/");
     
-        let [cid] = await db("comments").insert({
+        let cid = await dbc.insert("comments", {
             created: new Date(),
             body: body.substring(0, 1000),
             author: res.locals.id,
@@ -104,7 +104,7 @@ export default (ctx:Context) => {
     
         let comments = post.comments || [];
         comments.push(cid);
-        await db("posts").update({comments: JSON.stringify(comments)}).where("id", id);
+        await dbc.updatePost(id, {comments});
     
         res.redirect(`/posts/${id}`);
     });

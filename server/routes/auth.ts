@@ -3,7 +3,7 @@ import {Context} from "../server";
 import bcrypt from "bcrypt";
 
 export default (ctx:Context) => {
-    const {app, db, sessions} = ctx;
+    const {app, dbc, sessions} = ctx;
 
     app.get("/register", (req, res) => {
         res.render("register");
@@ -15,14 +15,14 @@ export default (ctx:Context) => {
         if (!/^([a-zA-Z0-9_-]){4,32}$/.test(username)) return res.render("register", { msg: "bad username" });
         if (!/^([a-zA-Z0-9_-]){4,32}$/.test(password)) return res.render("register", { msg: "bad password" });
 
-        const [user] = await db("users").select().where("username", username);
+        const user = await dbc.getByUsername("users", username);
         if (user) return res.render("register", { msg: "username is already taken" });
 
         const created = Date();
-        const [id] = await db("users").insert({ username, created });
+        const id = await dbc.insert("users", {username, created});
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(password, salt, async (err, hash) => {
-                await db("passwords").insert({ id, hash });
+                await dbc.insert("passwords", {id, hash});
 
                 res.cookie("session", sessions.add(id.toString()))
                     .cookie("username", username)
@@ -41,10 +41,10 @@ export default (ctx:Context) => {
 
         const msg = "Username or password is incorrect.";
 
-        const [user] = await db("users").select().where("username", username);
+        const user = await dbc.getByUsername("users", username);
         if (!user) return res.render("login", { msg });
 
-        const [pword] = await db("passwords").select().where("id", user.id);
+        const pword = await dbc.getById("passwords", user.id);
         bcrypt.compare(password, pword.hash, (err, result) => {
             if (!result) return res.render("login", { msg });
 
