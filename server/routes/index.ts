@@ -1,6 +1,12 @@
 import express from "express";
 import {Context} from "../server";
 
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en.json";
+
+TimeAgo.addDefaultLocale(en);
+const timeAgo = new TimeAgo("en-GB");
+
 export default (ctx:Context) => {
     const {app, dbc} = ctx;
     app.get("/", async (req, res) => {
@@ -11,7 +17,7 @@ export default (ctx:Context) => {
                 let post = {
                     title: r.title,
                     body: r.body,
-                    created: r.created,
+                    created: timeAgo.format(r.created),
                     id: r.id,
                     author: {},
                     commentcount: r.comments.length

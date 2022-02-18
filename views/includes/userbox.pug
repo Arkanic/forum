@@ -4,5 +4,6 @@ p
         - let userboxavatarlink = "/ico/defaultuser.png";
         if userbox.avatar
             - userboxavatarlink = `/files/${userbox.avatar}`
-        img(src=userboxavatarlink width="32" height="32")
-        i(class="userboxname")=userbox.username
+        .userboxavatarbox
+            img(class="userboxavatar" src=userboxavatarlink width="32" height="32")
+            i=userbox.username

@@ -83,7 +83,7 @@ nav ul li a:hover {
 }
 
 .postcomments {
-    
+    font-size: 12px;
 }
 
 .postcontents {
@@ -98,6 +98,7 @@ nav ul li a:hover {
     font-size: 12px;
 }
 
-.userboxname {
-    vertical-align: center;
+.userboxavatarbox {
+    display: flex;
+    align-items: center;
 }

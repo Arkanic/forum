@@ -4,6 +4,6 @@
         a(href=link)=post.title
     - let userbox = post.author
     include userbox.pug
-    p.postcomments #{post.commentcount} #[img(src="/ico/comment.png" width="16" height="16")]
+    p.postcomments #{post.created} » #{post.commentcount} #[img(src="/ico/comment.png" width="12" height="12")]
     - let postpreview = `${post.body.substring(0, 100)}${(post.body.length > 100) ? "..." : ""}`;
-    p.postpreview=postpreview
+    p.postpreview  #{postpreview}
