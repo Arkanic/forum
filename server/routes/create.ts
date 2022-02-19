@@ -3,6 +3,7 @@ import {Context} from "../server";
 import path from "path";
 import {customAlphabet} from "nanoid";
 import fileUpload, {UploadedFile} from "express-fileupload";
+import {Knex} from "knex";
 
 const DATA_DIR = "fdata";
 const FILE_DIR = "files";
@@ -10,15 +11,18 @@ const FILE_DIR = "files";
 const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const fnanoid = customAlphabet(alphabet, 32);
 
-function manipFile(req:express.Request):string {
+async function manipFile(req:express.Request, ctx:Context):Promise<string> {
     if(!req.files) return "";
 
-    let file:fileUpload.UploadedFile = req.files.file as any as fileUpload.UploadedFile;
+    const {dbc} = ctx;
 
-    let fpath = `./${DATA_DIR}/${FILE_DIR}`;
+    let file:fileUpload.UploadedFile = req.files.file as any as fileUpload.UploadedFile;
     let name = `${fnanoid()}${path.extname(file.name)}`;
     
-    file.mv(`${fpath}/${name}`);
+    const fid = dbc.insert("files", {
+        name,
+        data: file.data
+    });
 
     return name;
 }
@@ -36,7 +40,7 @@ export default (ctx:Context) => {
         const {title, body} = req.body;
     
         let name;
-        if(req.files) name = manipFile(req);
+        if(req.files) name = await manipFile(req, ctx);
     
         let id = res.locals.id;
     
@@ -75,7 +79,7 @@ export default (ctx:Context) => {
             let mime = (req.files.file as UploadedFile).mimetype
             if(!(mime == "image/png" || mime == "image/jpeg" || mime == "image/gif" || mime == "image/bmp" || mime == "image/webp")) return res.redirect("/profile");
     
-            let file = manipFile(req);
+            let file = await manipFile(req, ctx);
             await dbc.updateById("users", res.locals.id, {avatar:file});
         }
     

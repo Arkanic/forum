@@ -20,7 +20,7 @@ import index from "./routes/index";
 
 
 import database, {DbConnection} from "./db";
-import s, { Sessions } from "./session";
+import s, {Sessions} from "./session";
 
 export interface Context {
     app:express.Application,
@@ -39,12 +39,16 @@ database().then(db => {
 
     app.set("view engine", "pug");
     app.set("views", "./views");
-    app.use(fileUpload({}));
-    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(fileUpload({
+        limits: {
+            fileSize: 8388608 // 8mb
+        },
+        abortOnLimit: true
+    }));
+    app.use(bodyParser.urlencoded({extended: false}));
     app.use(cookieParser());
 
     app.use(express.static("static"));
-    app.use("/files", express.static("./fdata/files/"));
 
     if (process.env.NODE_ENV == "development") {
         const compiler = webpack(config);

@@ -10,7 +10,7 @@ export class Sessions extends Map {
     }
 
     add(name:string):string {
-        const id = nanoid(32);
+        const id = nanoid(128);
         this.set(id, name);
 
         setTimeout(() => {

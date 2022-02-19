@@ -2,12 +2,10 @@ import * as knex from "knex";
 import fs from "fs";
 
 const DATA_DIR = "fdata";
-const FILES_DIR = "files";
 
 export default async ():Promise<knex.Knex<any, unknown[]>> => {
     return new Promise((resolve, reject) => {
         if(!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
-        if(!fs.existsSync(`${DATA_DIR}/${FILES_DIR}`)) fs.mkdirSync(`${DATA_DIR}/${FILES_DIR}`);
 
         const db = knex.default({
             client: "better-sqlite3",
@@ -50,6 +48,10 @@ export async function initdb(schema:knex.Knex.SchemaBuilder):Promise<knex.Knex.S
         table.date("created");
         table.integer("author").unsigned();
         table.string("body", 1000);
+    }).createTable("files", table => {
+        table.increments("id").primary();
+        table.string("name");
+        table.binary("data", 8388608);
     });
 }
 
@@ -94,5 +96,10 @@ export class DbConnection {
     async fetchRecentPosts(count:number) {
         const posts = await this.db("posts").orderBy("id", "desc").limit(count);
         return posts;
+    }
+
+    async getFile(name:string) {
+        const [file] = await this.db("files").select().where("name", name);
+        return file;
     }
 }
