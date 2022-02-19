@@ -2,4 +2,5 @@
     - let userbox = cc.author
     include userbox.pug
     h6 #{cc.created} » ID #{cc.id}
-    p=cc.body
+    p
+        pre=cc.body

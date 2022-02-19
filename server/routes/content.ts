@@ -21,7 +21,7 @@ export default (ctx:Context) => {
 
     app.get("/posts/:id", async (req, res, next) => {
         const post = await dbc.getPost(req.params.id);
-        if (!post) return res.render("404");
+        if(!post) return res.render("404");
 
         let fpost: any = {
             title: post.title,
@@ -42,7 +42,7 @@ export default (ctx:Context) => {
         };
 
         let comments: any[] = [];
-        for (let i in post.comments) {
+        for(let i in post.comments) {
             let id = post.comments[i];
 
             let comment = await dbc.getById("comments", id);

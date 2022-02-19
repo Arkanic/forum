@@ -35,7 +35,7 @@ export default (ctx:Context) => {
         res.render("create");
     });
     app.post("/post", async (req, res) => {
-        if(!res.locals.loggedin) res.redirect("/login"); // stop
+        if(!res.locals.loggedin) return res.redirect("/login"); // stop
     
         const {title, body} = req.body;
     

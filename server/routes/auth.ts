@@ -11,12 +11,11 @@ export default (ctx:Context) => {
     app.post("/register", async (req, res) => {
         const { username, password, confpass } = req.body;
 
-        if (!username || !password || !confpass) return res.render("register", { msg: "empty boxes" });
-        if (!/^([a-zA-Z0-9_-]){4,32}$/.test(username)) return res.render("register", { msg: "bad username" });
-        if (!/^([a-zA-Z0-9_-]){4,32}$/.test(password)) return res.render("register", { msg: "bad password" });
-
+        if(!username || !password || !confpass) return res.render("register", { msg: "empty boxes" });
+        if(!/^([a-zA-Z0-9_-]){4,32}$/.test(username)) return res.render("register", { msg: "bad username" });
+        
         const user = await dbc.getByUsername("users", username);
-        if (user) return res.render("register", { msg: "username is already taken" });
+        if(user) return res.render("register", { msg: "username is already taken" });
 
         const created = Date();
         const id = await dbc.insert("users", {username, created});
