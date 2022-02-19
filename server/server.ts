@@ -7,6 +7,12 @@ import fileUpload from "express-fileupload";
 import bodyParser from "body-parser";
 
 
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en.json";
+
+TimeAgo.addDefaultLocale(en);
+
+
 import auth from "./routes/auth";
 import content from "./routes/content";
 import create from "./routes/create";

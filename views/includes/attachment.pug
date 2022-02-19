@@ -1,0 +1,8 @@
+div
+    if a.mime == "image/png" || a.mime == "image/jpeg" || a.mime == "image/gif" || a.mime == "image/bmp" || a.mime == "image/webp"
+        img(src=a.file)
+    else if a.mime == "video/webm" || a.mime == "video/mp4" || a.mime == "video/ogg" || a.mime == "video/quicktime" || a.mime == "video/x-m4v"
+        video(controls width="250")
+            source(src=a.file type=a.mime)
+    else
+        a(href=a.file) Attachment

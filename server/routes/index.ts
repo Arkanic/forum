@@ -2,9 +2,7 @@ import express from "express";
 import {Context} from "../server";
 
 import TimeAgo from "javascript-time-ago";
-import en from "javascript-time-ago/locale/en.json";
 
-TimeAgo.addDefaultLocale(en);
 const timeAgo = new TimeAgo("en-GB");
 
 export default (ctx:Context) => {

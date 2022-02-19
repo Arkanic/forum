@@ -2,6 +2,10 @@ import express from "express";
 import {Context} from "../server";
 import mime from "mime";
 
+import TimeAgo from "javascript-time-ago";
+
+const timeAgo = new TimeAgo("en-GB");
+
 export default (ctx:Context) => {
     const {app, dbc} = ctx;
 
@@ -34,8 +38,9 @@ export default (ctx:Context) => {
             let comment = await dbc.getById("comments", id);
             let fcomment = {
                 author: {},
-                created: comment.created,
-                body: comment.body
+                created: timeAgo.format(comment.created),
+                body: comment.body,
+                id: comment.id
             }
 
             let cuser = await dbc.getById("users", comment.author);

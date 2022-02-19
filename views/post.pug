@@ -12,8 +12,8 @@ html
         p
             if(fpost.attachment)
                 - let alink = `/files/${fpost.attachment}`
-                a(href=alink) attachment
-                p=fpost.amime
+                - let a = {file: alink, mime: fpost.amime}
+                include includes/attachment.pug
         hr
         h4 Comments
         p
