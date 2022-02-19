@@ -46,8 +46,8 @@ export default (ctx:Context) => {
     
         const pid = await dbc.insert("posts", {
             created: new Date(), 
-            title: title.substring(0, 100) || "unnamed",
-            body: body.substring(0, 3000) || "",
+            title: (title || "unnamed").substring(0, 100),
+            body: (body || "(no post)").substring(0, 3000),
             author: id,
             attachment: (req.files) ? name : null,
             comments: "[]"
