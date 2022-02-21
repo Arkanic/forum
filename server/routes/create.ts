@@ -45,7 +45,7 @@ export default (ctx:Context) => {
         let id = res.locals.id;
     
         const pid = await dbc.insert("posts", {
-            created: new Date(), 
+            created: Date.now(), 
             title: (title || "unnamed").substring(0, 100),
             body: (body || "(no post)").substring(0, 3000),
             author: id,
@@ -99,7 +99,7 @@ export default (ctx:Context) => {
         if(!post) return res.redirect("/");
     
         let cid = await dbc.insert("comments", {
-            created: new Date(),
+            created: Date.now(),
             body: body.substring(0, 1000),
             author: res.locals.id,
         });

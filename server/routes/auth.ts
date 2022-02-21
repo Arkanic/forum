@@ -17,7 +17,7 @@ export default (ctx:Context) => {
         const user = await dbc.getByUsername("users", username);
         if(user) return res.render("register", { msg: "username is already taken" });
 
-        const created = Date();
+        const created = Date.now();
         const id = await dbc.insert("users", {username, created});
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(password, salt, async (err, hash) => {
