@@ -12,6 +12,7 @@ export default async (type:string | undefined):Promise<knex.Knex<any, unknown[]>
         if(type == "production") {
             db = knex.default({
                 client: "pg",
+                version: "13.5",
                 connection: {
                     connectionString: process.env.DATABASE_URL,
                     ssl: {
