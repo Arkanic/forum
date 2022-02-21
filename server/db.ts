@@ -17,6 +17,12 @@ export default async (type:string | undefined):Promise<knex.Knex<any, unknown[]>
                     ssl: {
                         rejectUnauthorized: false
                     }
+                },
+                migrations: {
+                    directory: __dirname + "/db/migrations",
+                },
+                seeds: {
+                    directory: __dirname + "/db/seeds",
                 }
             });
         } else {
