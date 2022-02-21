@@ -47,7 +47,7 @@ export async function initdb(schema:knex.Knex.SchemaBuilder):Promise<knex.Knex.S
 
     return schema.createTable("users", table => {
         table.increments("id").primary();
-        table.date("created");
+        table.bigInteger("created").unsigned();
         table.string("username", 32);
         table.string("about", 500);
         table.string("email", 320);
@@ -57,7 +57,7 @@ export async function initdb(schema:knex.Knex.SchemaBuilder):Promise<knex.Knex.S
         table.binary("hash");
     }).createTable("posts", table => {
         table.increments("id").primary();
-        table.date("created");
+        table.bigInteger("created").unsigned();
         table.integer("author").unsigned();
         table.string("title", 100);
         table.string("body", 3000);
@@ -66,7 +66,7 @@ export async function initdb(schema:knex.Knex.SchemaBuilder):Promise<knex.Knex.S
         table.string("comments");
     }).createTable("comments", table => {
         table.increments("id").primary();
-        table.date("created");
+        table.bigInteger("created").unsigned();
         table.integer("author").unsigned();
         table.string("body", 1000);
     }).createTable("files", table => {
