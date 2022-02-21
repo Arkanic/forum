@@ -29,7 +29,7 @@ export interface Context {
 }
 
 
-database().then(db => {
+database(process.env.NODE_ENV).then(db => {
     const sessions = s();
     const dbConnection = new DbConnection(db);
 

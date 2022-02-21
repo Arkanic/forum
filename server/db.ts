@@ -3,17 +3,31 @@ import fs from "fs";
 
 const DATA_DIR = "fdata";
 
-export default async ():Promise<knex.Knex<any, unknown[]>> => {
+export default async (type:string | undefined):Promise<knex.Knex<any, unknown[]>> => {
     return new Promise((resolve, reject) => {
         if(!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
 
-        const db = knex.default({
-            client: "better-sqlite3",
-            connection: {
-                filename: `./${DATA_DIR}/forum.db`
-            },
-            useNullAsDefault: true
-        });
+        let db:knex.Knex<any, unknown[]> | PromiseLike<knex.Knex<any, unknown[]>>;
+
+        if(type == "production") {
+            db = knex.default({
+                client: "pg",
+                connection: {
+                    connectionString: process.env.DATABASE_URL,
+                    ssl: {
+                        rejectUnauthorized: false
+                    }
+                }
+            });
+        } else {
+            db = knex.default({
+                client: "better-sqlite3",
+                connection: {
+                    filename: `./${DATA_DIR}/forum.db`
+                },
+                useNullAsDefault: true
+            });
+        }
 
         initdb(db.schema).then((_) => {
             resolve(db);
