@@ -61,7 +61,8 @@ export default (ctx:Context) => {
     
         const user = await dbc.getById("users", res.locals.id);
         res.locals.profile = {
-            bio: user.about
+            bio: user.about,
+            email: user.email
         }
     
         res.render("profile");
@@ -69,10 +70,14 @@ export default (ctx:Context) => {
     app.post("/profile", async (req, res) => {
         if(!res.locals.loggedin) return res.redirect("/login");
     
-        const {bio} = req.body;
+        const {bio, email} = req.body;
     
         if(bio) {
             await dbc.updateById("users", res.locals.id, {about:bio});
+        }
+        if(email) {
+            let parts = email.split("@");
+            if(parts[1] && parts[0] > 0 && parts[0] < 65 && parts[1] > 0 && parts[1] < 256) await dbc.updateById("users", res.locals.id, {email});
         }
     
         if(req.files) if(req.files.file) {
@@ -87,7 +92,8 @@ export default (ctx:Context) => {
     });
     
     app.get("/comment", (req, res) => {
-        res.redirect("/");
+        if(!req.body.id) return res.redirect("/");
+        res.redirect(`/posts/${req.body.id}/`);
     });
     app.post("/comment", async (req, res) => {
         if(!res.locals.loggedin) return res.redirect("/login");

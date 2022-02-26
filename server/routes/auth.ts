@@ -1,18 +1,42 @@
-import express from "express";
 import {Context} from "../server";
 import bcrypt from "bcrypt";
+import genCaptcha, {randLetters} from "../captcha";
 
 export default (ctx:Context) => {
     const {app, dbc, sessions} = ctx;
 
+    let map:Map<string, string> = new Map();
+
     app.get("/register", (req, res) => {
+        let id = randLetters(32);
+        let captcha = genCaptcha();
+
+        res.locals.captcha = {
+            image: captcha.image,
+            id
+        };
+        map.set(id, captcha.text);
+
         res.render("register");
     });
     app.post("/register", async (req, res) => {
-        const { username, password, confpass } = req.body;
+        let cid = randLetters(32);
+        let ccaptcha = genCaptcha();
+
+        res.locals.captcha = {
+            image: ccaptcha.image,
+            id: cid
+        };
+        map.set(cid, ccaptcha.text);
+        const { username, password, confpass, captcha, captchaid } = req.body;
 
         if(!username || !password || !confpass) return res.render("register", { msg: "empty boxes" });
         if(!/^([a-zA-Z0-9_-]){4,32}$/.test(username)) return res.render("register", { msg: "bad username" });
+
+        if(!captcha || !captchaid) return res.render("register", {msg: "bad captcha"});
+        let right = map.get(captchaid);
+        if(!right) return res.render("register", {msg: "stop screwing around"});
+        if(captcha !== right) return res.render("register", {msg: "invalid captcha"});
         
         const user = await dbc.getByUsername("users", username);
         if(user) return res.render("register", { msg: "username is already taken" });

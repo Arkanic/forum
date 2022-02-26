@@ -11,8 +11,7 @@
     "sbuild": "tsc",
     "server": "cross-env NODE_ENV=production node ./builds/server.js",
     "devserver": "cross-env NODE_ENV=development node ./builds/server.js --progress",
-    "quick": "npm run build && npm run server",
-    "quickdev": "npm run sbuild && npm run devserver",
+    "quick": "npm run build && npm run devserver",
     "start": "npm run server"
   },
   "repository": {
@@ -39,6 +38,7 @@
     "bcrypt": "^5.0.1",
     "better-sqlite3": "^7.5.0",
     "body-parser": "^1.19.1",
+    "canvas": "^2.9.0",
     "clean-webpack-plugin": "^4.0.0",
     "cookie-parser": "^1.4.6",
     "cross-env": "^7.0.3",

@@ -102,3 +102,7 @@ nav ul li a:hover {
     display: flex;
     align-items: center;
 }
+
+.avatar {
+    border-radius: 50%;
+}
