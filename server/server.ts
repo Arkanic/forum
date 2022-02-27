@@ -90,11 +90,11 @@ database(process.env.NODE_ENV).then(db => {
     let captchaMap:Map<string, string> = new Map();
     app.use((req, res, next) => {
         if(req.method == "POST") {
-            console.log("we there");
             const {captcha, captchaid} = req.body;
             if(!captcha || !captchaid) res.locals.captchamsg = "invalid data";
             else {
                 let right = captchaMap.get(captchaid);
+                captchaMap.delete(captchaid);
                 if(!right) res.locals.captchamsg = "stop messing around";
                 else {
                     if(captcha !== right) res.locals.captchamsg = "invalid input";
