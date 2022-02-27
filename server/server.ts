@@ -7,6 +7,7 @@ import fileUpload from "express-fileupload";
 import bodyParser from "body-parser";
 
 
+import {nanoid} from "nanoid";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
 
@@ -21,6 +22,7 @@ import index from "./routes/index";
 
 import database, {DbConnection} from "./db";
 import s, {Sessions} from "./session";
+import genCaptcha from "./captcha";
 
 export interface Context {
     app:express.Application,
@@ -79,6 +81,38 @@ database(process.env.NODE_ENV).then(db => {
         if (!res.locals.loggedin) return next();
         let [user] = await db("users").select().where("id", res.locals.id);
         res.locals.username = user.username;
+
+        next();
+    });
+
+    
+    // captcha setup (one is generated for every request, whether it is used or not is optional)
+    let captchaMap:Map<string, string> = new Map();
+    app.use((req, res, next) => {
+        if(req.method == "POST") {
+            console.log("we there");
+            const {captcha, captchaid} = req.body;
+            if(!captcha || !captchaid) res.locals.captchamsg = "invalid data";
+            else {
+                let right = captchaMap.get(captchaid);
+                if(!right) res.locals.captchamsg = "stop messing around";
+                else {
+                    if(captcha !== right) res.locals.captchamsg = "invalid input";
+                    else {
+                        res.locals.captchavalid = true;
+                    }
+                }
+            }
+        }
+
+        let id = nanoid();
+        let captcha = genCaptcha();
+
+        res.locals.captcha = {
+            image: captcha.image,
+            id
+        };
+        captchaMap.set(id, captcha.text);
 
         next();
     });
