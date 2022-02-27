@@ -96,7 +96,6 @@ export class DbConnection {
 
     async insert(table:string, content:any) {
         let id = await this.db(table).insert(content);
-        console.log(id);
         let [h] = id;
         return h;
     }
