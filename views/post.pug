@@ -19,9 +19,11 @@ html
         p
         - let commentformid = fpost.id
         include includes/commentform.pug
-        br
+        hr
         for comment in fpost.comments
             - let cc = comment
             include includes/comment.pug
-        br
+        hr
         include includes/commentform.pug
+
+        include includes/foot.pug

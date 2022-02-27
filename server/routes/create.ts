@@ -36,6 +36,8 @@ export default (ctx:Context) => {
     });
     app.post("/post", async (req, res) => {
         if(!res.locals.loggedin) return res.redirect("/login"); // stop
+
+        if(!res.locals.captchavalid) return res.render("/post", {msg: res.locals.captchamsg});
     
         const {title, body} = req.body;
     
@@ -100,6 +102,8 @@ export default (ctx:Context) => {
     
         const {body, id} = req.body;
         if(!body || !id) return res.redirect("/");
+
+        if(!res.locals.captchavalid) return res.redirect(`/posts/${id}/`);
     
         let post = await dbc.getById("posts", id);
         if(!post) return res.redirect("/");

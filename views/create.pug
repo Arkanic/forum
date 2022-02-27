@@ -3,6 +3,8 @@ html
         include includes/head.pug
     body
         include includes/header.pug
+        if msg
+            p.servermsg=msg
         form(method="POST" action="/post" enctype="multipart/form-data")
             input(required name="title" type="text" placeholder="title")
             br
@@ -10,4 +12,10 @@ html
             br
             input(name="file" type="file")
             br
+
+            include includes/captcha.pug
+
+            br
             input(type="submit" value="Submit")
+
+        include includes/foot.pug
