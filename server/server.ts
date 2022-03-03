@@ -1,3 +1,5 @@
+import path from "path";
+
 import express from "express";
 import webpack from "webpack";
 import webpackDevMiddleware from "webpack-dev-middleware";
@@ -40,7 +42,7 @@ database(process.env.NODE_ENV).then(db => {
     const app = express();
 
     app.set("view engine", "pug");
-    app.set("views", "./views");
+    app.set("views", path.join(__dirname, "../views"));
     app.use(fileUpload({
         limits: {
             fileSize: 8388608 // 8mb
