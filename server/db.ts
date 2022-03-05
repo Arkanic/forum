@@ -52,7 +52,7 @@ export async function initdb(schema:knex.Knex.SchemaBuilder):Promise<knex.Knex.S
         table.string("about", 500);
         table.string("email", 320);
         table.string("avatar");
-        table.bigInteger("permissions").unsigned();
+        table.string("permissions");
     }).createTable("passwords", table => {
         table.integer("id").unsigned();
         table.binary("hash");

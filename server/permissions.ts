@@ -10,19 +10,24 @@ class Permissions {
         this.db = db;
     }
 
-    async hasFlag(user:number, index:number):Promise<boolean> {
+    async hasFlag(user:number, code:string):Promise<boolean> {
+        let char = code[0];
+
         let userData = await this.db.getById("users", user);
-        let perms = userData.permissions;
-        return (perms & (2 ** index)) > 0;
+        let perms:string = userData.permissions;
+        return perms.includes(char);
     }
 
-    async modFlag(user:number, index:number, trip:boolean):Promise<void> {
-        let userData = await this.db.getById("users", user);
-        let perms = userData.permissions;
-        let mask = 2 ** index;
-        let result = trip ? (mask | perms) : (mask & ~perms);
+    async modFlag(user:number, code:string, trip:boolean):Promise<void> {
+        let char = code[0];
 
-        await this.db.updateById("users", user, {permissions: result});
+        let userData = await this.db.getById("users", user);
+        let perms:string = userData.permissions;
+        if(trip) {
+            if(!perms.includes(char)) perms += char;
+        } else perms = perms.replace(char, "");
+
+        await this.db.updateById("users", user, {permissions: perms});
     }
 }
 
