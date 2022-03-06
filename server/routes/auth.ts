@@ -24,9 +24,7 @@ export default (ctx:Context) => {
             bcrypt.hash(password, salt, async (err, hash) => {
                 await dbc.insert("passwords", {id, hash});
 
-                res.cookie("session", sessions.add(id.toString()))
-                    .cookie("username", username)
-                    .redirect("/");
+                return res.render("message", {message: "Success. Now try logging in.", redirectto: "/login"});
             });
         });
     });

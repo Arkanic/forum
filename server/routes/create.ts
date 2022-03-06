@@ -119,6 +119,7 @@ export default (ctx:Context) => {
             created: Date.now(),
             body: body.substring(0, 1000),
             author: res.locals.id,
+            parent: id
         });
     
         post.comments = JSON.parse(post.comments);

@@ -106,3 +106,12 @@ nav ul li a:hover {
 .avatar {
     border-radius: 50%;
 }
+
+.deleteform {
+    float: right;
+}
+
+.deletesubmit {
+    border: 0;
+    width: 32px;
+}

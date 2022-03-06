@@ -69,6 +69,7 @@ export async function initdb(schema:knex.Knex.SchemaBuilder):Promise<knex.Knex.S
         table.increments("id").primary();
         table.bigInteger("created").unsigned();
         table.integer("author").unsigned();
+        table.integer("parent").unsigned();
         table.string("body", 1000);
     }).createTable("files", table => {
         table.increments("id").primary();
@@ -103,6 +104,7 @@ export class DbConnection {
 
     async getPost(id:number | string) {
         let post = await this.getById("posts", id);
+        if(!post) return null;
         post.comments = JSON.parse(post.comments);
         return post;
     }
@@ -124,5 +126,9 @@ export class DbConnection {
     async getFile(name:string) {
         const [file] = await this.db("files").select().where("name", name);
         return file;
+    }
+
+    async deleteById(table:string, id:number | string) {
+        await this.db(table).del().where("id", id);
     }
 }

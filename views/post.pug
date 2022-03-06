@@ -6,6 +6,9 @@ html
         h2=fpost.title
         - let userbox = {username: fpost.author.username, avatar: fpost.author.avatar, id: fpost.author.id}
         include includes/userbox.pug
+        
+        include includes/delete.pug
+
         hr
         p
             pre.postcontents=fpost.body
@@ -24,6 +27,7 @@ html
             - let cc = comment
             include includes/comment.pug
         hr
-        include includes/commentform.pug
+        if fpost.comments.length > 3
+            include includes/commentform.pug
 
         include includes/foot.pug

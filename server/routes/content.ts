@@ -9,10 +9,10 @@ import TimeAgo from "javascript-time-ago";
 const timeAgo = new TimeAgo("en-GB");
 
 export default (ctx:Context) => {
-    const {app, dbc} = ctx;
+    const {app, dbc, permissions} = ctx;
 
     app.get("/files/:name", async (req, res, next) => {
-        if(!ctx.permissions.hasFlag(res.locals.permissions, PermissionCodes.View)) {
+        if(!permissions.hasFlag(res.locals.permissions, PermissionCodes.View)) {
             return res.render("message", {message: "You don't have permission to view files!", redirectto: "/"});
         }
 
@@ -50,16 +50,31 @@ export default (ctx:Context) => {
             avatar: user.avatar
         };
 
+        let del:any = {};
+        if(res.locals.id === user.id || permissions.hasFlag(res.locals.permissions, PermissionCodes.Delete)) del.canDelete = true;
+        else del.canDelete = false;
+        del.id = post.id;
+        del.type = "post";
+        res.locals.del = del;
+
         let comments: any[] = [];
         for(let i in post.comments) {
             let id = post.comments[i];
 
             let comment = await dbc.getById("comments", id);
+
+            let del:any = {};
+            if(res.locals.id === comment.author || permissions.hasFlag(res.locals.permissions, PermissionCodes.Delete)) del.canDelete = true;
+            else del.canDelete = false;
+            del.id = post.id;
+            del.type = "comment";
+
             let fcomment = {
                 author: {},
                 created: timeAgo.format(comment.created),
                 body: comment.body,
-                id: comment.id
+                id: comment.id,
+                del
             }
 
             let cuser = await dbc.getById("users", comment.author);

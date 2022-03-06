@@ -19,6 +19,7 @@ TimeAgo.addDefaultLocale(en);
 import auth from "./routes/auth";
 import content from "./routes/content";
 import create from "./routes/create";
+import manage from "./routes/manage";
 import index from "./routes/index";
 
 
@@ -138,6 +139,7 @@ database(process.env.NODE_ENV).then(db => {
     content(ctx);
     create(ctx);
     index(ctx);
+    manage(ctx);
 
 
     app.get("*", (req, res) => {
