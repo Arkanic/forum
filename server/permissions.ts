@@ -1,7 +1,15 @@
 import {DbConnection} from "./db";
 
-// 0 1 2 3 4 ... 63
-// 
+// abcdefgh..
+// view comment post delete admin
+
+export enum PermissionCodes {
+    View = "v",
+    Comment = "c",
+    Post = "p",
+    Delete = "d",
+    Admin = "a"
+}
 
 class Permissions {
     db:DbConnection
@@ -10,24 +18,40 @@ class Permissions {
         this.db = db;
     }
 
-    async hasFlag(user:number, code:string):Promise<boolean> {
-        let char = code[0];
-
-        let userData = await this.db.getById("users", user);
-        let perms:string = userData.permissions;
-        return perms.includes(char);
+    hasFlag(perms:string, code:PermissionCodes):boolean {
+        return perms.includes(code);
     }
 
-    async modFlag(user:number, code:string, trip:boolean):Promise<void> {
-        let char = code[0];
+    modFlag(perms:string, code:PermissionCodes, trip:boolean):string {
+        if(trip) {
+            if(!perms.includes(code)) perms += code;
+        } else perms = perms.replace(code, "");
 
+        return perms;
+    }
+
+    async userHasFlag(user:number, code:PermissionCodes):Promise<boolean> {
         let userData = await this.db.getById("users", user);
         let perms:string = userData.permissions;
-        if(trip) {
-            if(!perms.includes(char)) perms += char;
-        } else perms = perms.replace(char, "");
+        return this.hasFlag(perms, code);
+    }
+
+    async userModFlag(user:number, code:PermissionCodes, trip:boolean):Promise<void> {
+        let userData = await this.db.getById("users", user);
+        let perms:string = userData.permissions;
+
+        perms = this.modFlag(perms, code, trip);
 
         await this.db.updateById("users", user, {permissions: perms});
+    }
+
+    defaultUserPermissions():string {
+        return PermissionCodes.View + PermissionCodes.Comment + PermissionCodes.Post;
+    }
+
+    defaultAnonPermissions():string {
+        // need to be logged in to comment/post, so adding these permissions will do nothing
+        return PermissionCodes.View;
     }
 }
 

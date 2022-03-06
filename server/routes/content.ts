@@ -1,5 +1,6 @@
 import express from "express";
 import {Context} from "../server";
+import {PermissionCodes} from "../permissions";
 import mime from "mime";
 import path from "path";
 
@@ -11,6 +12,10 @@ export default (ctx:Context) => {
     const {app, dbc} = ctx;
 
     app.get("/files/:name", async (req, res, next) => {
+        if(!ctx.permissions.hasFlag(res.locals.permissions, PermissionCodes.View)) {
+            return res.render("message", {message: "You don't have permission to view files!", redirectto: "/"});
+        }
+
         const file = await dbc.getFile(req.params.name);
         if(!file) return res.render("404");
 
@@ -20,6 +25,10 @@ export default (ctx:Context) => {
     });
 
     app.get("/posts/:id", async (req, res, next) => {
+        if(!ctx.permissions.hasFlag(res.locals.permissions, PermissionCodes.View)) {
+            return res.render("message", {message: "You don't have permission to view posts!", redirectto: "/"});
+        }
+
         const post = await dbc.getPost(req.params.id);
         if(!post) return res.render("404");
 
@@ -69,6 +78,10 @@ export default (ctx:Context) => {
     });
 
     app.get("/users/:id", async (req, res, next) => {
+        if(!ctx.permissions.hasFlag(res.locals.permissions, PermissionCodes.View)) {
+            return res.render("message", {message: "You don't have permission to view users!", redirectto: "/"});
+        }
+
         const user = await dbc.getById("users", req.params.id);
         if (!user) return next();
 
@@ -82,5 +95,4 @@ export default (ctx:Context) => {
         res.locals.fuser = fuser;
         res.render("user");
     });
-
 }

@@ -1,13 +1,18 @@
 import express from "express";
 import {Context} from "../server";
+import {PermissionCodes} from "../permissions";
 
 import TimeAgo from "javascript-time-ago";
 
 const timeAgo = new TimeAgo("en-GB");
 
 export default (ctx:Context) => {
-    const {app, dbc} = ctx;
+    const {app, dbc, permissions} = ctx;
     app.get("/", async (req, res) => {
+        if(!permissions.hasFlag(res.locals.permissions, PermissionCodes.View)) {
+            return res.render("message", {message: "You don't have permission to view posts!", redirectto: "/login"});
+        }
+
         const recents = await dbc.fetchRecentPosts(100);
         const posts = await Promise.all(recents.map((r: any) => {
             return new Promise(async (resolve) => {

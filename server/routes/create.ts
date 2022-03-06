@@ -3,7 +3,7 @@ import {Context} from "../server";
 import path from "path";
 import {customAlphabet} from "nanoid";
 import fileUpload, {UploadedFile} from "express-fileupload";
-import {Knex} from "knex";
+import {PermissionCodes} from "../permissions";
 
 const DATA_DIR = "fdata";
 const FILE_DIR = "files";
@@ -35,7 +35,10 @@ export default (ctx:Context) => {
         res.render("create");
     });
     app.post("/post", async (req, res) => {
-        if(!res.locals.loggedin) return res.redirect("/login"); // stop
+        if(!res.locals.loggedin) return res.redirect("/login");
+        if(!ctx.permissions.hasFlag(res.locals.permissions, PermissionCodes.Post)) {
+            res.render("message", {message: "You don't have permission to post!", redirectto: "/"});
+        }
 
         if(!res.locals.captchavalid) return res.render("/post", {msg: res.locals.captchamsg});
     
@@ -102,6 +105,10 @@ export default (ctx:Context) => {
     
         const {body, id} = req.body;
         if(!body || !id) return res.redirect("/");
+
+        if(!ctx.permissions.hasFlag(res.locals.permissions, PermissionCodes.Comment)) {
+            return res.render("message", {message: "You don't have permission to comment!", redirectto: `/posts/${id}`});
+        }
 
         if(!res.locals.captchavalid) return res.redirect(`/posts/${id}/`);
     

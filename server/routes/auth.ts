@@ -1,11 +1,8 @@
 import {Context} from "../server";
 import bcrypt from "bcrypt";
-import genCaptcha, {randLetters} from "../captcha";
 
 export default (ctx:Context) => {
     const {app, dbc, sessions} = ctx;
-
-    let map:Map<string, string> = new Map();
 
     app.get("/register", (req, res) => {
         res.render("register");
@@ -22,7 +19,7 @@ export default (ctx:Context) => {
         if(user) return res.render("register", { msg: "username is already taken" });
 
         const created = Date.now();
-        const id = await dbc.insert("users", {username, created});
+        const id = await dbc.insert("users", {username, created, permissions: ctx.permissions.defaultUserPermissions()});
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(password, salt, async (err, hash) => {
                 await dbc.insert("passwords", {id, hash});

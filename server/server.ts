@@ -25,17 +25,20 @@ import index from "./routes/index";
 import database, {DbConnection} from "./db";
 import s, {Sessions} from "./session";
 import genCaptcha from "./captcha";
+import Permissions from "./permissions";
 
 export interface Context {
     app:express.Application,
     dbc:DbConnection,
-    sessions:Sessions
+    sessions:Sessions,
+    permissions:Permissions
 }
 
 
 database(process.env.NODE_ENV).then(db => {
     const sessions = s();
     const dbConnection = new DbConnection(db);
+    const permissions = new Permissions(dbConnection);
 
     const config = require("../webpack/webpack.dev");
 
@@ -80,9 +83,13 @@ database(process.env.NODE_ENV).then(db => {
     });
     // setup locals for pug
     app.use(async (req, res, next) => {
-        if (!res.locals.loggedin) return next();
+        if (!res.locals.loggedin) {
+            res.locals.permissions = permissions.defaultAnonPermissions();
+            return next();
+        }
         let [user] = await db("users").select().where("id", res.locals.id);
         res.locals.username = user.username;
+        res.locals.permissions = user.permissions;
 
         next();
     });
@@ -123,7 +130,8 @@ database(process.env.NODE_ENV).then(db => {
     let ctx:Context = {
         app,
         dbc: dbConnection,
-        sessions
+        sessions,
+        permissions
     };
 
     auth(ctx);
