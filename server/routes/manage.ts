@@ -46,4 +46,36 @@ export default (ctx:Context) => {
 
         res.render("message", {message: "Comment successfully deleted!", redirectto: "/"});
     });
+    app.post("/users/:id/permissions", async (req, res) => {
+        if(!res.locals.loggedin) return res.render("/login");
+
+        let {id} = req.params;
+        if(!id) return res.render("message", {message: "Invalid data", redirectto: "/"});
+
+        let redirect = `/users/${id}/`;
+        let user = await dbc.getById("users", id);
+        if(!user) return res.render("message", {message: "User does not exist", redirectto: redirect});
+        
+        if(!res.locals.captchavalid) return res.render("message", {message: res.locals.captchamsg, redirectto: redirect});
+
+        if(!permissions.hasFlag(res.locals.permissions, PermissionCodes.Admin)) {
+            return res.render("message", {message: "You don't have permission to modify roles.", redirectto: redirect});
+        }
+
+        let perms = "";
+        let vals:Array<string> = Object.values(PermissionCodes);
+        for(let i in vals) {
+            if(req.body[vals[i]]) {
+                perms += vals[i];
+            }
+        }
+
+        if(res.locals.id === user.id && !perms.includes(PermissionCodes.Admin)) {
+            return res.render("message", {message: "You can't self demote admin", redirectto: redirect});
+        }
+
+        await dbc.updateById("users", id, {permissions: perms});
+
+        return res.render("message", {message: "Success. Permissions have been updated.", redirectto: redirect});
+    });
 }

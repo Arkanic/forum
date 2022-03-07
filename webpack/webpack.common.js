@@ -11,7 +11,8 @@ module.exports = {
     },
 
     entry: {
-        common: relative("../client/common/index.ts")
+        common: relative("../client/common/index.ts"),
+        message: relative("../client/message/index.ts")
     },
     output: {
         filename: "[name].js",

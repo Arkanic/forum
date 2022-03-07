@@ -5,6 +5,8 @@ html
         include includes/header.pug
 
         p=message
-        a(href=redirectto) Ok
+        a(href=redirectto id="redirect") Ok
+
+        script(src="/message.js")
 
         include includes/foot.pug

@@ -3,6 +3,10 @@ import fs from "fs";
 
 const DATA_DIR = "fdata";
 
+/**
+ * Setup database & return it
+ * Async
+ */
 export default async (type:string | undefined):Promise<knex.Knex<any, unknown[]>> => {
     return new Promise((resolve, reject) => {
         if(!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);

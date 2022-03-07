@@ -1,0 +1,12 @@
+if perms.canModify
+    hr
+    h3 Permissions
+    form(method="POST" action=`/users/${perms.id}/permissions`)
+        each name, perm in perms.perms
+            label(for=perm)=name
+            input(type="checkbox" name=perm checked=(perms.permissions.includes(perm)))
+            br
+
+        include captcha.pug
+
+        input(type="submit" value="Submit")

@@ -1,6 +1,6 @@
 import express from "express";
 import {Context} from "../server";
-import {PermissionCodes} from "../permissions";
+import {PermissionCodes, CodeNameMap} from "../permissions";
 import mime from "mime";
 import path from "path";
 
@@ -64,7 +64,7 @@ export default (ctx:Context) => {
             let comment = await dbc.getById("comments", id);
 
             let del:any = {};
-            if(res.locals.id === comment.author || permissions.hasFlag(res.locals.permissions, PermissionCodes.Delete)) del.canDelete = true;
+            if(res.locals.loggedin && (res.locals.id === comment.author || permissions.hasFlag(res.locals.permissions, PermissionCodes.Delete))) del.canDelete = true;
             else del.canDelete = false;
             del.id = post.id;
             del.type = "comment";
@@ -99,6 +99,14 @@ export default (ctx:Context) => {
 
         const user = await dbc.getById("users", req.params.id);
         if (!user) return next();
+
+        let perms:any = {canModify: false};
+        if(res.locals.loggedin && permissions.hasFlag(res.locals.permissions, PermissionCodes.Admin)) perms.canModify = true;
+        perms.perms = CodeNameMap;
+        perms.id = req.params.id;
+        perms.permissions = user.permissions
+
+        res.locals.perms = perms;
 
         let fuser = {
             created: user.created,
