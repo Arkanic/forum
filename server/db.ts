@@ -12,33 +12,13 @@ export default async (type:string | undefined):Promise<knex.Knex<any, unknown[]>
         if(!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
 
         let db:knex.Knex<any, unknown[]> | PromiseLike<knex.Knex<any, unknown[]>>;
-
-        if(type == "production") {
-            db = knex.default({
-                client: "pg",
-                version: "13.5",
-                connection: {
-                    connectionString: process.env.DATABASE_URL,
-                    ssl: {
-                        rejectUnauthorized: false
-                    }
-                },
-                migrations: {
-                    directory: __dirname + "/db/migrations",
-                },
-                seeds: {
-                    directory: __dirname + "/db/seeds",
-                }
-            });
-        } else {
-            db = knex.default({
-                client: "better-sqlite3",
-                connection: {
-                    filename: `./${DATA_DIR}/forum.db`
-                },
-                useNullAsDefault: true
-            });
-        }
+        db = knex.default({
+            client: "better-sqlite3",
+            connection: {
+                filename: `./${DATA_DIR}/forum.db`
+            },
+            useNullAsDefault: true
+        });
 
         initdb(db.schema).then((_) => {
             resolve(db);

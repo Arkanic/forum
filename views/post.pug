@@ -10,6 +10,7 @@ html
         include includes/delete.pug
 
         hr
+        h6=`${new Date(fpost.created).toString()}`
         p
             pre.postcontents=fpost.body
         p
