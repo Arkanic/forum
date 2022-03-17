@@ -1,6 +1,9 @@
 import * as knex from "knex";
 import fs from "fs";
 
+import {getMigration, getMigrations} from "./db/migrator";
+import constants from "./constants";
+
 const DATA_DIR = "fdata";
 
 /**
@@ -20,46 +23,36 @@ export default async (type:string | undefined):Promise<knex.Knex<any, unknown[]>
             useNullAsDefault: true
         });
 
-        initdb(db.schema).then((_) => {
+        initdb(db).then((_) => {
             resolve(db);
         });
     });
 }
 
-export async function initdb(schema:knex.Knex.SchemaBuilder):Promise<knex.Knex.SchemaBuilder> {
-    if(await schema.hasTable("users")) return;
+function readVersion():string {
+    return fs.readFileSync(`./${DATA_DIR}/version`).toString();
+}
 
-    return schema.createTable("users", table => {
-        table.increments("id").primary();
-        table.bigInteger("created").unsigned();
-        table.string("username", 32);
-        table.string("about", 500);
-        table.string("email", 320);
-        table.string("avatar");
-        table.string("permissions");
-    }).createTable("passwords", table => {
-        table.integer("id").unsigned();
-        table.binary("hash");
-    }).createTable("posts", table => {
-        table.increments("id").primary();
-        table.bigInteger("created").unsigned();
-        table.integer("author").unsigned();
-        table.string("title", 100);
-        table.string("body", 3000);
-        table.string("attachment");
-        // comments is an array of comment ids
-        table.string("comments");
-    }).createTable("comments", table => {
-        table.increments("id").primary();
-        table.bigInteger("created").unsigned();
-        table.integer("author").unsigned();
-        table.integer("parent").unsigned();
-        table.string("body", 1000);
-    }).createTable("files", table => {
-        table.increments("id").primary();
-        table.string("name");
-        table.binary("data", 8388608);
-    });
+function createVersion(version:string) {
+    fs.writeFileSync(`./${DATA_DIR}/version`, version);
+}
+
+export async function initdb(db:knex.Knex<any, unknown[]>):Promise<knex.Knex.SchemaBuilder> {
+    let {schema} = db;
+    let version = "0.0.0";
+    if(await schema.hasTable("users")) {
+        version = readVersion();
+    } else {
+        createVersion(constants.VERSION);
+    }
+
+    let migrations = getMigrations(version);
+    for(let i in migrations) {
+        let migration = await getMigration(migrations[i]);
+        migration.up(schema);
+    }
+
+    return schema;
 }
 
 // provides generic functions for db
