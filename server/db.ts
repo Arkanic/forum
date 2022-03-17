@@ -42,8 +42,6 @@ export async function initdb(db:knex.Knex<any, unknown[]>):Promise<knex.Knex.Sch
     let version = "0.0.0";
     if(await schema.hasTable("users")) {
         version = readVersion();
-    } else {
-        createVersion(constants.VERSION);
     }
 
     let migrations = getMigrations(version);
@@ -51,6 +49,8 @@ export async function initdb(db:knex.Knex<any, unknown[]>):Promise<knex.Knex.Sch
         let migration = await getMigration(migrations[i]);
         migration.up(schema);
     }
+
+    createVersion(constants.VERSION);
 
     return schema;
 }

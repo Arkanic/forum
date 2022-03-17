@@ -11,7 +11,7 @@
     "sbuild": "tsc",
     "server": "cross-env NODE_ENV=production node ./builds/server.js",
     "devserver": "cross-env NODE_ENV=development node ./builds/server.js --progress",
-    "quick": "npm run sbuild && npm run devserver",
+    "quick": "npm run clean && npm run sbuild  && npm run devserver",
     "start": "npm run server"
   },
   "repository": {
