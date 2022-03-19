@@ -101,13 +101,13 @@ database(process.env.NODE_ENV).then(db => {
     app.use((req, res, next) => {
         if(req.method == "POST") {
             const {captcha, captchaid} = req.body;
-            if(!captcha || !captchaid) res.locals.captchamsg = "invalid data";
+            if(!captcha || !captchaid) res.locals.captchamsg = "Incomplete form data for captcha";
             else {
                 let right = captchaMap.get(captchaid);
                 captchaMap.delete(captchaid);
-                if(!right) res.locals.captchamsg = "stop messing around";
+                if(!right) res.locals.captchamsg = "Stop messing around";
                 else {
-                    if(captcha !== right) res.locals.captchamsg = "invalid input";
+                    if(captcha !== right) res.locals.captchamsg = "Wrong captcha answer";
                     else {
                         res.locals.captchavalid = true;
                     }

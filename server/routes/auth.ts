@@ -8,15 +8,17 @@ export default (ctx:Context) => {
         res.render("register");
     });
     app.post("/register", async (req, res) => {
-        const { username, password, confpass} = req.body;
+        const {username, password, confpassword} = req.body;
 
-        if(!username || !password || !confpass) return res.render("register", { msg: "empty boxes" });
-        if(!/^([a-zA-Z0-9_-]){4,32}$/.test(username)) return res.render("register", { msg: "bad username" });
+        if(!username || !password || !confpassword) return res.render("message", {message: "You are missing some data", redirectto: "/register"});
+        if(!/^([a-zA-Z0-9_-]){4,32}$/.test(username)) return res.render("message", {message: "Username is not in the correct format!", redirectto: "/register"});
 
-        if(!res.locals.captchavalid) return res.render("register", {msg: res.locals.captchamsg});
+        if(!res.locals.captchavalid) return res.render("message", {message: res.locals.captchamsg, redirectto: "/register"});
         
         const user = await dbc.getByUsername("users", username);
-        if(user) return res.render("register", { msg: "username is already taken" });
+        if(user) return res.render("message", {message: "username is already taken", redirectto: "/register"});
+
+        if(password !== confpassword) return res.render("message", {message: "Passwords don't match", redirectto: "/register"});
 
         const created = Date.now();
         const id = await dbc.insert("users", {username, created, permissions: ctx.permissions.defaultUserPermissions()});
@@ -35,16 +37,16 @@ export default (ctx:Context) => {
     app.post("/login", async (req, res) => {
         const { username, password } = req.body;
 
-        if (!username || !password) return res.render("login", { msg: "empty boxes" });
+        if (!username || !password) return res.render("message", {message: "You are missing some data", redirectto: "/login"});
 
         const msg = "Username or password is incorrect.";
 
         const user = await dbc.getByUsername("users", username);
-        if (!user) return res.render("login", { msg });
+        if (!user) return res.render("message", {message: msg, redirectto: "/login"});
 
         const pword = await dbc.getById("passwords", user.id);
         bcrypt.compare(password, pword.hash, (err, result) => {
-            if (!result) return res.render("login", { msg });
+            if (!result) return res.render("message", {message: msg, redirectto: "/login"});
 
             res.cookie("session", sessions.add(user.id))
                 .cookie("username", username)

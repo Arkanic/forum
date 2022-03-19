@@ -10,7 +10,14 @@ html
             br
             label(for="file") Avatar: 
             input(name="file" type="file" accept="image/png,image/bmp,image/gif,image/jpeg,image/webp")
+            hr
+            h6 Password Change
+            input(name="password" type="password" placeholder="Password")
             br
+            input(name="newpassword" type="password" placeholder="New Password")
+            br
+            input(name="confnewpassword" type="password" placeholder="Confirm New Password")
+            hr
             input(type="submit" value="Submit")
-        
+
         include includes/foot.pug
