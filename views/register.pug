@@ -5,6 +5,8 @@ html
         include includes/header.pug
         if msg
             p(class="servermsg")=msg
+        if firstaccount
+            p Welcome! when you register this first account it'll become admin!
         form(method="POST" action="/register")
             input(required name="username" type="text" placeholder="Username")
             br

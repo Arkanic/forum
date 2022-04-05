@@ -84,6 +84,9 @@ database(process.env.NODE_ENV).then(db => {
     });
     // setup locals for pug
     app.use(async (req, res, next) => {
+        let count = (await db("users").select()).length;
+        if(count == 0) res.locals.firstaccount = true;
+
         if (!res.locals.loggedin) {
             res.locals.permissions = permissions.defaultAnonPermissions();
             return next();
@@ -91,7 +94,6 @@ database(process.env.NODE_ENV).then(db => {
         let [user] = await db("users").select().where("id", res.locals.id);
         res.locals.username = user.username;
         res.locals.permissions = user.permissions;
-
         next();
     });
 

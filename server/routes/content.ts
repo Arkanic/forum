@@ -1,4 +1,3 @@
-import express from "express";
 import {Context} from "../server";
 import {PermissionCodes, CodeNameMap} from "../permissions";
 import mime from "mime";
@@ -57,7 +56,7 @@ export default (ctx:Context) => {
         del.type = "post";
         res.locals.del = del;
 
-        let comments: any[] = [];
+        let comments:any[] = [];
         for(let i in post.comments) {
             let id = post.comments[i];
 

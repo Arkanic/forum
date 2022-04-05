@@ -1,5 +1,6 @@
 import {Context} from "../server";
 import bcrypt from "bcrypt";
+import {PermissionCodes} from "../permissions";
 
 export default (ctx:Context) => {
     const {app, dbc, sessions} = ctx;
@@ -21,7 +22,9 @@ export default (ctx:Context) => {
         if(password !== confpassword) return res.render("message", {message: "Passwords don't match", redirectto: "/register"});
 
         const created = Date.now();
-        const id = await dbc.insert("users", {username, created, permissions: ctx.permissions.defaultUserPermissions()});
+        let permissions = ctx.permissions.defaultUserPermissions();
+        if(res.locals.firstaccount) permissions += `${PermissionCodes.Admin}${PermissionCodes.Delete}`;
+        const id = await dbc.insert("users", {username, created, permissions});
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(password, salt, async (err, hash) => {
                 await dbc.insert("passwords", {id, hash});
@@ -37,7 +40,9 @@ export default (ctx:Context) => {
     app.post("/login", async (req, res) => {
         const { username, password } = req.body;
 
-        if (!username || !password) return res.render("message", {message: "You are missing some data", redirectto: "/login"});
+        if(!username || !password) return res.render("message", {message: "You are missing some data", redirectto: "/login"});
+
+        if(!res.locals.captchavalid) return res.render("message", {message: res.locals.captchamsg, redirectto: "/login"});
 
         const msg = "Username or password is incorrect.";
 
