@@ -6,7 +6,7 @@ html
         if msg
             p(class="servermsg")=msg
         if firstaccount
-            p Welcome! when you register this first account it'll become admin!
+            p When you register this first account it'll become admin!
         form(method="POST" action="/register")
             input(required name="username" type="text" placeholder="Username")
             br

@@ -3,6 +3,10 @@ html
         include includes/head.pug
     body
         include includes/header.pug
+
+        if firstaccount
+            p Welcome! Head over to #[a(href="/register") register] to make the initial admin account!
+
         each post in posts
             include includes/preview.pug
     
