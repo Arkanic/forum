@@ -17,6 +17,7 @@ export function randLetters(len:number):string {
     }
 
     return result;
+
 }
 
 export default function genCaptcha():Captcha {
