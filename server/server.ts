@@ -100,31 +100,39 @@ database(process.env.NODE_ENV).then(db => {
     
     // captcha setup (one is generated for every request, whether it is used or not is optional)
     let captchaMap:Map<string, string> = new Map();
+    const captchasEnabled = false;
+
     app.use((req, res, next) => {
-        if(req.method == "POST") {
-            const {captcha, captchaid} = req.body;
-            if(!captcha || !captchaid) res.locals.captchamsg = "Incomplete form data for captcha";
-            else {
-                let right = captchaMap.get(captchaid);
-                captchaMap.delete(captchaid);
-                if(!right) res.locals.captchamsg = "Stop messing around";
+        if(captchasEnabled) {
+            res.locals.captchasEnabled = true;
+            if(req.method == "POST") {
+                const {captcha, captchaid} = req.body;
+                if(!captcha || !captchaid) res.locals.captchamsg = "Incomplete form data for captcha";
                 else {
-                    if(captcha !== right) res.locals.captchamsg = "Wrong captcha answer";
+                    let right = captchaMap.get(captchaid);
+                    captchaMap.delete(captchaid);
+                    if(!right) res.locals.captchamsg = "Stop messing around";
                     else {
-                        res.locals.captchavalid = true;
+                        if(captcha !== right) res.locals.captchamsg = "Wrong captcha answer";
+                        else {
+                            res.locals.captchavalid = true;
+                        }
                     }
                 }
             }
+
+            let id = nanoid();
+            let captcha = genCaptcha();
+
+            res.locals.captcha = {
+                image: captcha.image,
+                id
+            };
+            captchaMap.set(id, captcha.text);
+        } else {
+            res.locals.captchasenabled = false;
+            res.locals.captchavalid = true;
         }
-
-        let id = nanoid();
-        let captcha = genCaptcha();
-
-        res.locals.captcha = {
-            image: captcha.image,
-            id
-        };
-        captchaMap.set(id, captcha.text);
 
         next();
     });

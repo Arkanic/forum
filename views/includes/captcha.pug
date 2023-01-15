@@ -1,7 +1,8 @@
-br
-h6 Captcha
-img(src=captcha.image)
-br
-input(name="captcha" type="text" width="6" placeholder="captcha..." required)
-input(name="captchaid" class="hidden" type="text" value=captcha.id)
-br
+if captchasenabled
+    br
+    h6 Captcha
+    img(src=captcha.image)
+    br
+    input(name="captcha" type="text" width="6" placeholder="captcha..." required)
+    input(name="captchaid" class="hidden" type="text" value=captcha.id)
+    br
